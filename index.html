@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Guard Patrol Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/html5-qrcode"></script>
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f4f6f8; }
+    h2 { text-align: center; }
+    #officer-reader, #point-reader { width: 100%; max-width: 300px; margin: 15px auto; }
+    label { font-weight: bold; }
+    select { margin-bottom: 20px; }
+    a { display: inline-block; margin-top: 20px; }
+  </style>
+</head>
+
+<body>
+<h2>Guard Patrol System</h2>
+
+<label>Site:</label>
+<select id="site">
+  <option>Site A</option>
+  <option>Site B</option>
+</select>
+
+<h3>Scan Officer QR</h3>
+<div id="officer-reader"></div>
+
+<h3>Scan Patrol Point</h3>
+<div id="point-reader"></div>
+
+<a href="report.html">View Patrol Dashboard</a>
+
+<script>
+let officer = "";
+let scans = JSON.parse(localStorage.getItem("scans") || "[]");
+let scannedPoints = [];
+
+const siteSelect = document.getElementById("site");
+const officerScanner = new Html5Qrcode("officer-reader");
+const pointScanner = new Html5Qrcode("point-reader");
+
+// --- STEP 1: SCAN OFFICER QR ---
+officerScanner.start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
+  async text => {
+    officer = text;
+    alert("Officer logged in: " + officer);
+
+    // Stop officer scanner after login
+    await officerScanner.stop();
+    document.getElementById("officer-reader").innerHTML = "<p><b>Officer logged in</b></p>";
+
+    // Now start location point scanner
+    startPointScanner();
+  }
+);
+
+// --- STEP 2: SCAN LOCATION POINTS ---
+function startPointScanner() {
+  document.getElementById("point-reader").innerHTML = ""; // ensure container ready
+
+  pointScanner.start(
+    { facingMode: "environment" },
+    { fps: 10, qrbox: 250 },
+    async point => {
+
+      if (!officer) {
+        alert("Please scan officer QR first");
+        return;
+      }
+
+      // Prevent duplicate point scans
+      if (scannedPoints.includes(point)) {
+        alert("This patrol point has already been scanned!");
+        return;
+      }
+
+      // Record scan
+      scans.push({
+        site: siteSelect.value,
+        officer,
+        point,
+        time: new Date().toLocaleString()
+      });
+
+      scannedPoints.push(point);
+      localStorage.setItem("scans", JSON.stringify(scans));
+
+      alert("Patrol point scanned: " + point);
+
+      // Pause scanner briefly
+      await pointScanner.stop();
+      setTimeout(() => {
+        startPointScanner(); // restart for next point
+      }, 2000);
+    }
+  );
+}
+</script>
+</body>
+</html>
