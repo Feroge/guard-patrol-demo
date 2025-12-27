@@ -1,9 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Guard Patrol System</title>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js"></script>
+
+  <!-- QR Scanner (Browser-friendly) -->
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <!-- Custom JS -->
+  <script src="app.js" defer></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f7f7f7; }
+    h2 { color: #333; }
+    .container { max-width: 500px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    input, button { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #ccc; }
+    button { background: #007bff; color: white; border: none; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    .hidden { display: none; }
+    #qr-reader { width: 100%; margin: 10px 0; }
+    ul { list-style: none; padding: 0; }
+    li { padding: 5px 0; }
+  </style>
 </head>
 <body>
-  <h2>System Reset – New Version Coming</h2>
+  <div class="container" id="login-container">
+    <h2>Guard Patrol Login</h2>
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
+    <button id="login-btn">Login</button>
+    <p id="login-error" style="color:red;"></p>
+  </div>
+
+  <div class="container hidden" id="dashboard-container">
+    <h2 id="welcome-msg">Welcome</h2>
+
+    <!-- Admin View -->
+    <div id="admin-panel" class="hidden">
+      <h3>Admin Dashboard</h3>
+      <ul id="patrol-reports"></ul>
+    </div>
+
+    <!-- Guard View -->
+    <div id="guard-panel" class="hidden">
+      <h3>Guard Patrol</h3>
+      <button id="start-patrol-btn">Start Patrol</button>
+      <div id="qr-reader" class="hidden"></div>
+      <h4>Patrol Progress</h4>
+      <ul id="patrol-progress"></ul>
+      <button id="finish-patrol-btn" class="hidden">Finish Patrol</button>
+    </div>
+
+    <button id="logout-btn" style="background:#dc3545;">Logout</button>
+  </div>
 </body>
 </html>
