@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Patrol Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; padding: 20px; background: #f4f6f8; }
+    h2 { text-align: center; }
+    .card { background: white; border-radius: 10px; padding: 12px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+    .label { color: #6b7280; }
+    .value { font-weight: bold; color: #111827; }
+  </style>
+</head>
+
+<body>
+<h2>Patrol Dashboard</h2>
+<div id="dashboard"></div>
+
+<script>
+const scans = JSON.parse(localStorage.getItem("scans") || "[]");
+const container = document.getElementById("dashboard");
+
+if (scans.length === 0) {
+  container.innerHTML = "<p>No patrol scans yet.</p>";
+} else {
+  scans.reverse().forEach(r => {
+    container.innerHTML += `
+      <div class="card">
+        <div class="row"><span class="label">Officer</span><span class="value">${r.officer}</span></div>
+        <div class="row"><span class="label">Site</span><span class="value">${r.site}</span></div>
+        <div class="row"><span class="label">Point</span><span class="value">${r.point}</span></div>
+        <div class="row"><span class="label">Time</span><span class="value">${r.time}</span></div>
+      </div>
+    `;
+  });
+}
+</script>
+</body>
+</html>
