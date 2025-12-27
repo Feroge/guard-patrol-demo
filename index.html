@@ -26,7 +26,65 @@
   <a href="report.html">View Patrol Dashboard</a>
 </p>
 
-<script>
+<<script>
+let officer = "";
+let scans = JSON.parse(localStorage.getItem("scans") || "[]");
+
+const siteSelect = document.getElementById("site");
+
+const officerScanner = new Html5Qrcode("officer-reader");
+const pointScanner = new Html5Qrcode("point-reader");
+
+// --- OFFICER SCAN (ONLY ONCE) ---
+officerScanner.start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
+  async text => {
+    officer = text;
+    alert("Officer logged in: " + officer);
+
+    await officerScanner.stop(); // STOP after login
+    document.getElementById("officer-reader").innerHTML =
+      "<p><b>Officer logged in</b></p>";
+  }
+);
+
+// --- PATROL POINT SCAN ---
+pointScanner.start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
+  async point => {
+
+    if (!officer) {
+      alert("Please scan officer QR first");
+      return;
+    }
+
+    scans.push({
+      site: siteSelect.value,
+      officer,
+      point,
+      time: new Date().toLocaleString()
+    });
+
+    localStorage.setItem("scans", JSON.stringify(scans));
+
+    alert("Patrol point scanned: " + point);
+
+    // PAUSE scanner briefly to avoid repeat alerts
+    await pointScanner.stop();
+
+    setTimeout(() => {
+      pointScanner.start(
+        { facingMode: "environment" },
+        { fps: 10, qrbox: 250 },
+        arguments.callee
+      );
+    }, 2000); // 2-second delay
+  }
+);
+</script>
+>
 let officer = "";
 let scans = JSON.parse(localStorage.getItem("scans") || "[]");
 
