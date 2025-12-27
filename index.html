@@ -35,6 +35,9 @@
 let officer = "";
 let scans = JSON.parse(localStorage.getItem("scans") || "[]");
 
+// Track points scanned in this session
+let scannedPoints = [];
+
 const siteSelect = document.getElementById("site");
 
 const officerScanner = new Html5Qrcode("officer-reader");
@@ -47,7 +50,7 @@ officerScanner.start(
   async text => {
     officer = text;
     alert("Officer logged in: " + officer);
-    await officerScanner.stop(); 
+    await officerScanner.stop();
     document.getElementById("officer-reader").innerHTML = "<p><b>Officer logged in</b></p>";
   }
 );
@@ -63,6 +66,13 @@ pointScanner.start(
       return;
     }
 
+    // Check if this point has already been scanned
+    if (scannedPoints.includes(point)) {
+      alert("This patrol point has already been scanned!");
+      return;
+    }
+
+    // Record scan
     scans.push({
       site: siteSelect.value,
       officer,
@@ -70,6 +80,7 @@ pointScanner.start(
       time: new Date().toLocaleString()
     });
 
+    scannedPoints.push(point); // mark as scanned
     localStorage.setItem("scans", JSON.stringify(scans));
 
     alert("Patrol point scanned: " + point);
