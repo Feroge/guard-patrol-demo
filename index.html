@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Guard Patrol Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/html5-qrcode"></script>
+</head>
+
+<body style="font-family:Arial; padding:20px;">
+
+<h2>Guard Patrol System</h2>
+
+<label>Site:</label>
+<select id="site">
+  <option>Site A</option>
+  <option>Site B</option>
+</select>
+
+<h3>Scan Officer QR</h3>
+<div id="officer-reader" style="width:300px;"></div>
+
+<h3>Scan Patrol Point</h3>
+<div id="point-reader" style="width:300px;"></div>
+
+<p>
+  <a href="report.html">View Patrol Dashboard</a>
+</p>
+
+<script>
+let officer = "";
+let scans = JSON.parse(localStorage.getItem("scans") || "[]");
+
+new Html5Qrcode("officer-reader").start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
+  text => {
+    officer = text;
+    alert("Officer logged in: " + officer);
+  }
+);
+
+new Html5Qrcode("point-reader").start(
+  { facingMode: "environment" },
+  { fps: 10, qrbox: 250 },
+  point => {
+    scans.push({
+      site: document.getElementById("site").value,
+      officer,
+      point,
+      time: new Date().toLocaleString()
+    });
+    localStorage.setItem("scans", JSON.stringify(scans));
+    alert("Point scanned: " + point);
+  }
+);
+</script>
+
+</body>
+</html>
